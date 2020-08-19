@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
 const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 const app = express();
 
@@ -23,15 +24,32 @@ app.get('/hello', function(req, res){
   res.json({greetings: "Hello, API"});
 });
 
-app.post('/api/fileanalyse', (req, res) => {
-  console.log(req.body);
-  const chunks = [];
-  req.on('data', chunk => chunks.push(chunk));
-  req.on('end', () => {
-    const data = Buffer.concat(chunks);
-    console.log(data);
-    res.send(data)
-  });
+app.post('/api/fileanalyse', upload.single('upfile'), (req, res, next) => {
+  next();
+});
+
+// Not found middleware
+app.use((req, res, next) => {
+  return next({status: 404, message: 'not found'})
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  let errCode, errMessage
+
+  if (err.errors) {
+    // mongoose validation error
+    errCode = 400 // bad request
+    const keys = Object.keys(err.errors)
+    // report the first validation error
+    errMessage = err.errors[keys[0]].message
+  } else {
+    // generic or custom error
+    errCode = err.status || 500
+    errMessage = err.message || 'Internal Server Error'
+  }
+  res.status(errCode).type('txt')
+    .send(errMessage)
 });
 
 const listener = app.listen(process.env.PORT, () => {
