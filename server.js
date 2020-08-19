@@ -3,6 +3,10 @@
 var express = require('express');
 var cors = require('cors');
 
+// Git/REPL.it syncing webhook
+const gitWebhook = require('./webhooks/git.js');
+app.use('/git', gitWebhook);
+
 // require and use "multer"...
 
 var app = express();
