@@ -19,6 +19,6 @@ app.get('/hello', function(req, res){
   res.json({greetings: "Hello, API"});
 });
 
-const listener = app.listen(process.env.PORT || 3000, () => {
+const listener = app.listen(process.env.PORT, () => {
   console.log('Server is listening on port ' + listener.address().port);
 });
