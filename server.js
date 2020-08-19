@@ -25,12 +25,13 @@ app.get('/hello', function(req, res){
 });
 
 app.post('/api/fileanalyse', upload.single('upfile'), (req, res, next) => {
-  next();
+  const { originalname, mimetype, size } = req.file;
+  !req.file ? next() : res.json({ name: originalname, type: mimetype, size });
 });
 
 // Not found middleware
 app.use((req, res, next) => {
-  return next({status: 404, message: 'not found'})
+  return next({status: 404, message: '404 Error: not found.'})
 });
 
 // Error handling middleware
